@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Mentor AI BOB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0f2027;
+      --card-color: #1e2a38;
+      --text-color: #ffffff;
+      --accent: #00c6ff;
+      --sidebar-bg: #111c27;
+      --link-color: #ffffffcc;
+      --link-hover: #ffffff;
+    }
+
+    body.light {
+      --bg-color: #f3f3f3;
+      --card-color: #ffffff;
+      --text-color: #111111;
+      --sidebar-bg: #e6e9ef;
+      --link-color: #333333cc;
+      --link-hover: #111;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .logo span {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--link-color);
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      color: var(--link-hover);
+    }
+
+    .main {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-header {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    select, button, input {
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    #chat-container {
+      background-color: var(--card-color);
+      padding: 20px;
+      margin-top: 10px;
+      border-radius: 10px;
+      height: 400px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 15px;
+    }
+
+    .user {
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .bot {
+      color: var(--text-color);
+    }
+
+    .question-input {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .question-input input {
+      flex: 1;
+    }
+
+    .question-input button {
+      background-color: var(--accent);
+      color: white;
+      font-weight: bold;
+    }
+
+    .popular-topics {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background-color: var(--card-color);
+      font-size: 0.9rem;
+      max-width: 180px;
+      align-self: flex-end;
+    }
+
+    .solved-box {
+      background-color: var(--card-color);
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: fit-content;
+      margin-bottom: 10px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      background-color: #555;
+      color: white;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+
+      .main {
+        padding: 10px;
+      }
+
+      #chat-container {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="sidebar">
+    <div class="logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="AI">
+      <span>Code Mentor AI BOB</span>
+    </div>
+    <div class="nav-links">
+      <a href="#">Dashboard</a>
+      <a href="#">Tutorials</a>
+      <a href="#">Playground</a>
+      <a href="#">Settings</a>
+    </div>
+  </div>
+  <div class="main">
+    <div class="solved-box">Questions Solved: <span id="solved">0</span></div>
+    <div class="topbar">
+      <div class="chat-header">Chat with BOB AI (DSA Only)</div>
+      <div class="tools">
+        <select id="language">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+        </select>
+        <button onclick="toggleTheme()">🌓</button>
+        <button onclick="alert('Login feature coming soon!')">👤 Login</button>
+      </div>
+    </div>
+    <div class="popular-topics">
+      <strong>Popular Topics:</strong>
+      <ul>
+        <li>Arrays</li>
+        <li>Linked Lists</li>
+        <li>Trees</li>
+        <li>Graphs</li>
+        <li>Sorting</li>
+      </ul>
+    </div>
+    <div id="chat-container"></div>
+    <div class="question-input">
+      <input type="text" id="question" placeholder="Ask your DSA question...">
+      <button onclick="askQuestion()">Ask BOB AI</button>
+    </div>
+    <div class="controls">
+      <button onclick="clearHistory()">Clear History</button> 
+      <button onclick="exportPDF()">Export to PDF</button>  
+    </div>
+  </div>
+  <script>
+    let solvedCount = localStorage.getItem('solvedCount') || 0;
+    document.getElementById('solved').innerText = solvedCount;
+
+    const chatContainer = document.getElementById("chat-container");
+    const history = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    history.forEach(({ role, text }) => renderMessage(role, text));
+
+    function renderMessage(role, text) {
+      const div = document.createElement("div");
+      div.classList.add("message");
+      div.innerHTML = `<span class="${role}">${role === "user" ? "You" : "BOB AI"}:</span> <span class="${role === "user" ? "user" : "bot"}">${text}</span>`;
+      chatContainer.appendChild(div);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function askQuestion() {
+      const input = document.getElementById("question");
+      const query = input.value.trim();
+      if (!query) return;
+
+      renderMessage("user", query);
+      input.value = "";
+
+      history.push({ role: "user", text: query });
+
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDdQLEqyTWcbFXMYll_etMAdy-Qto9tNXE", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: query }]
+            }
+          ],
+          systemInstruction: {
+            role: "system",
+            parts: [
+              {
+                text: `You are a Data structure and Algorithm Instructor. You will only reply to the problem related to Data structure and Algorithm. If user asks anything else, reply rudely.`
+              }
+            ]
+          }
+        })
+      });
+
+      const data = await res.json();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "(No reply)";
+
+      renderMessage("bot", reply);
+      history.push({ role: "bot", text: reply });
+      localStorage.setItem("chatHistory", JSON.stringify(history));
+
+      solvedCount++;
+      localStorage.setItem("solvedCount", solvedCount);
+      document.getElementById("solved").innerText = solvedCount;
+    }
+
+    function clearHistory() {
+      localStorage.removeItem("chatHistory");
+      chatContainer.innerHTML = "";
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+      history.forEach(({ role, text }) => {
+        doc.text(`${role === "user" ? "You" : "BOB AI"}:`, 10, y);
+        y += 7;
+        doc.text(text, 10, y);
+        y += 10;
+      });
+      doc.save("chat-history.pdf");
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
+  </script>
+</body>
+</html>
